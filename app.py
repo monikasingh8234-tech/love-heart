@@ -1,162 +1,565 @@
+
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyArrowPatch
+from datetime import date, datetime
 
-# Page settings
+# ---------------- PAGE SETTINGS ----------------
 st.set_page_config(
-    page_title="Your Love, Your Story ❤️",
+    page_title="Love Story | Compatibility 💗",
     page_icon="💘",
     layout="centered"
 )
 
-# Page heading
-st.title("❤️ Your Love, Your Story 💘")
-st.write("Create your own beautiful love heart!")
+st.markdown("""
+<style>
+.stApp {
+    background: linear-gradient(180deg, #fff0f5, #fffaf5);
+}
+h1, h2, h3 {
+    color: #d6336c;
+}
+div.stButton > button {
+    background: linear-gradient(90deg, #ff5c93, #ff1744);
+    color: white;
+    border-radius: 15px;
+    border: none;
+    padding: 12px;
+    font-weight: bold;
+}
+div.stButton > button:hover {
+    color: white;
+    border: 1px solid #d6336c;
+}
+div[data-testid="stMetric"] {
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 15px;
+    border: 1px solid #ffd0df;
+}
+</style>
+""", unsafe_allow_html=True)
 
-# Select relationship status
+st.title("💗 Your Love, Your Story")
+st.caption("Two hearts. One story. A little bit of magic. 🎀")
+
+st.write(
+    "Discover your fun compatibility score, compare your "
+    "favourite things, and keep your special dates close to your heart."
+)
+
+# ---------------- OPTIONS ----------------
+likes_options = [
+    "Music", "Movies", "Travel", "Food", "Dancing",
+    "Gaming", "Reading", "Photography", "Nature",
+    "Shopping", "Cooking", "Fitness", "Pets",
+    "Long conversations", "Surprises", "Quality time"
+]
+
+dislikes_options = [
+    "Lying", "Ignoring messages", "Being late",
+    "Loud places", "Crowds", "Arguments",
+    "Possessiveness", "Last-minute plans",
+    "Spicy food", "Waking up early", "Dishonesty",
+    "Poor communication", "Cancelled plans"
+]
+
+communication_options = [
+    "Talk things out calmly",
+    "Need some time before talking",
+    "Prefer writing my feelings",
+    "Depends on the situation"
+]
+
+love_language_options = [
+    "Quality time", "Words of affirmation",
+    "Acts of service", "Gifts",
+    "Physical affection"
+]
+
+weekend_options = [
+    "A cozy day at home",
+    "A romantic date outside",
+    "An adventure or road trip",
+    "Meeting friends",
+    "Trying something new"
+]
+
+# ---------------- PERSONAL DETAILS ----------------
+st.header("💌 01. Your Love Story")
+
 status = st.radio(
-    "Are you Single or Mingle?",
-    ["Single", "Mingle"],
+    "Relationship status",
+    ["Single 💖", "Mingle 💑"],
     horizontal=True
 )
 
-# Name inputs
-if status == "Single":
-    name = st.text_input("Enter your name")
-    partner = ""
+is_mingle = status == "Mingle 💑"
 
+col1, col2 = st.columns(2)
+
+with col1:
+    your_name = st.text_input("Your name ✨", placeholder="Enter your name")
+    your_birthday = st.date_input(
+        "Your birthday 🎂",
+        value=date(2000, 1, 1),
+        min_value=date(1900, 1, 1),
+        max_value=date.today(),
+        format="DD/MM/YYYY"
+    )
+
+with col2:
+    if is_mingle:
+        partner_name = st.text_input(
+            "Partner's name 💕", placeholder="Their name"
+        )
+        partner_birthday = st.date_input(
+            "Partner's birthday 🎂",
+            value=date(2000, 6, 1),
+            min_value=date(1900, 1, 1),
+            max_value=date.today(),
+            format="DD/MM/YYYY"
+        )
+    else:
+        partner_name = ""
+        partner_birthday = None
+        st.info("Your perfect story starts with loving yourself. 💗")
+
+anniversary = st.date_input(
+    "Relationship anniversary 💍",
+    value=None,
+    min_value=date(1900, 1, 1),
+    max_value=date.today(),
+    format="DD/MM/YYYY"
+) if is_mingle else None
+
+# ---------------- PREFERENCES ----------------
+st.header("💞 02. Likes & Dislikes")
+
+st.write("Choose the things you love and the things you don't enjoy.")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.subheader("Your favourites 💗")
+    your_likes = st.multiselect(
+        "Things you like",
+        likes_options,
+        key="your_likes"
+    )
+
+    st.subheader("Your dislikes 🙈")
+    your_dislikes = st.multiselect(
+        "Things you dislike",
+        dislikes_options,
+        key="your_dislikes"
+    )
+
+with col2:
+    if is_mingle:
+        st.subheader("Their favourites 💕")
+        partner_likes = st.multiselect(
+            "Things your partner likes",
+            likes_options,
+            key="partner_likes"
+        )
+
+        st.subheader("Their dislikes 🙈")
+        partner_dislikes = st.multiselect(
+            "Things your partner dislikes",
+            dislikes_options,
+            key="partner_dislikes"
+        )
+    else:
+        partner_likes = []
+        partner_dislikes = []
+        st.info("Add a partner to compare your preferences.")
+
+# ---------------- LOVE QUIZ ----------------
+st.header("💘 03. The Couple Quiz")
+
+st.caption(
+    "Answer honestly. Similar answers can help you understand "
+    "each other, but different answers aren't necessarily bad."
+)
+
+your_communication = st.selectbox(
+    "How do you handle disagreements?",
+    communication_options,
+    key="your_communication"
+)
+
+your_love_language = st.selectbox(
+    "What makes you feel loved?",
+    love_language_options,
+    key="your_love_language"
+)
+
+your_weekend = st.selectbox(
+    "Your ideal weekend?",
+    weekend_options,
+    key="your_weekend"
+)
+
+if is_mingle:
+    partner_communication = st.selectbox(
+        "How does your partner handle disagreements?",
+        communication_options,
+        key="partner_communication"
+    )
+
+    partner_love_language = st.selectbox(
+        "What makes your partner feel loved?",
+        love_language_options,
+        key="partner_love_language"
+    )
+
+    partner_weekend = st.selectbox(
+        "Your partner's ideal weekend?",
+        weekend_options,
+        key="partner_weekend"
+    )
 else:
-    partner = st.text_input("Partner's name")
-    name = st.text_input("Your name")
+    partner_communication = ""
+    partner_love_language = ""
+    partner_weekend = ""
 
-# Generate button
-if st.button("Create My Love Heart 💘", use_container_width=True):
+# ---------------- HELPERS ----------------
+def next_birthday(birthday, today):
+    upcoming = birthday.replace(year=today.year)
 
-    if not name.strip():
-        st.warning("Please enter your name!")
+    if upcoming < today:
+        upcoming = birthday.replace(year=today.year + 1)
 
-    elif status == "Mingle" and not partner.strip():
-        st.warning("Please enter your partner's name!")
+    return upcoming
+
+
+def days_until(event_date, today):
+    return (event_date - today).days
+
+
+def overlap_score(first, second):
+    """Compare selected preferences symmetrically."""
+    first = set(first)
+    second = set(second)
+
+    if not first and not second:
+        return None
+
+    union = first | second
+    return len(first & second) / len(union) * 100
+
+
+def compatibility_label(score):
+    if score >= 90:
+        return "Magical Connection ✨"
+    elif score >= 75:
+        return "Beautiful Bond 💖"
+    elif score >= 60:
+        return "Growing Together 🌷"
+    elif score >= 40:
+        return "A Journey of Discovery 💌"
+    return "Room to Understand Each Other 🌱"
+
+
+def draw_heart(your_name, partner_name, score, single=False):
+    t = np.linspace(0, 2 * np.pi, 1000)
+
+    x = 16 * np.sin(t) ** 3
+    y = (
+        13 * np.cos(t)
+        - 5 * np.cos(2 * t)
+        - 2 * np.cos(3 * t)
+        - np.cos(4 * t)
+    )
+
+    fig, ax = plt.subplots(figsize=(8, 6))
+    fig.patch.set_facecolor("#fff5f7")
+    ax.set_facecolor("#fff5f7")
+
+    ax.fill(x, y, color="#ff477e", zorder=1)
+    ax.plot(x, y, color="#e60050", linewidth=2, zorder=2)
+
+    if single:
+        ax.text(
+            0, 1, your_name,
+            color="white", fontsize=18, fontweight="bold",
+            ha="center", va="center", zorder=5
+        )
+        ax.text(
+            0, -3, "SELF LOVE ♥",
+            color="#ffe5ec", fontsize=11, fontweight="bold",
+            ha="center", va="center", zorder=5
+        )
+    else:
+        arrow = FancyArrowPatch(
+            (-14, -7.5), (14, 7.5),
+            arrowstyle="-|>", mutation_scale=28,
+            linewidth=3, color="#ffd700", zorder=5
+        )
+        ax.add_patch(arrow)
+
+        ax.text(
+            -7, -3.5, partner_name,
+            color="white", fontsize=11, fontweight="bold",
+            ha="center", va="center", zorder=6
+        )
+        ax.text(
+            7, 3.5, your_name,
+            color="white", fontsize=11, fontweight="bold",
+            ha="center", va="center", zorder=6
+        )
+        ax.text(
+            0, 0, "♥",
+            color="#ffd700", fontsize=23,
+            ha="center", va="center", zorder=7
+        )
+
+    ax.set_title(
+        "Your Love, Your Story ❤️",
+        fontsize=18, color="#d6336c", pad=15
+    )
+    ax.set_aspect("equal")
+    ax.set_xlim(-21, 21)
+    ax.set_ylim(-17, 17)
+    ax.axis("off")
+    plt.tight_layout()
+
+    return fig
+
+
+# ---------------- CALCULATE ----------------
+st.divider()
+
+if st.button("Create Our Love Story 💘", use_container_width=True):
+
+    if not your_name.strip():
+        st.warning("Please enter your name first! 💗")
+
+    elif is_mingle and not partner_name.strip():
+        st.warning("Please enter your partner's name! 💌")
+
+    elif is_mingle and your_name.strip().casefold() == partner_name.strip().casefold():
+        st.warning("Enter two different names to compare your love story.")
 
     else:
-        # Heart shape
-        t = np.linspace(0, 2 * np.pi, 1000)
+        st.session_state["love_result"] = True
 
-        x = 16 * np.sin(t) ** 3
-        y = (
-            13 * np.cos(t)
-            - 5 * np.cos(2 * t)
-            - 2 * np.cos(3 * t)
-            - np.cos(4 * t)
+if st.session_state.get("love_result", False):
+
+    # Recheck names in case inputs changed
+    if not your_name.strip() or (is_mingle and not partner_name.strip()):
+        st.session_state["love_result"] = False
+        st.info("Please complete the required name fields and generate again.")
+        st.stop()
+
+    st.divider()
+    st.header("🌹 Your Results")
+
+    if not is_mingle:
+        score = None
+        st.subheader(f"A little love for {your_name.strip()} 💗")
+        st.write(
+            "Your story matters too. Celebrate your interests, "
+            "dreams, boundaries and the person you are becoming."
+        )
+    else:
+        # Shared likes
+        likes_score = overlap_score(your_likes, partner_likes)
+
+        # Shared dislikes are compared separately.
+        dislikes_score = overlap_score(your_dislikes, partner_dislikes)
+
+        # Conflicts: one person's like is the other's dislike.
+        conflicts = (
+            (set(your_likes) & set(partner_dislikes))
+            | (set(partner_likes) & set(your_dislikes))
         )
 
-        # Create figure
-        fig, ax = plt.subplots(figsize=(10, 9))
+        # Quiz similarity: exact matches earn full points.
+        quiz_pairs = [
+            (your_communication, partner_communication),
+            (your_love_language, partner_love_language),
+            (your_weekend, partner_weekend)
+        ]
+        quiz_score = (
+            sum(a == b for a, b in quiz_pairs) / len(quiz_pairs) * 100
+        )
 
-        fig.patch.set_facecolor("#fff5f7")
-        ax.set_facecolor("#fff5f7")
+        # Ignore preference categories if both people left them empty.
+        components = [
+            (likes_score, 0.40),
+            (dislikes_score, 0.20),
+            (quiz_score, 0.40)
+        ]
 
-        # Draw red heart
-        ax.fill(x, y, color="#ff1744", zorder=1)
-        ax.plot(x, y, color="#e60026", linewidth=2, zorder=2)
+        available = [
+            (value, weight)
+            for value, weight in components
+            if value is not None
+        ]
 
-        if status == "Single":
+        score = round(
+            sum(value * weight for value, weight in available)
+            / sum(weight for _, weight in available)
+        )
 
-            # Single design
-            ax.text(
-                0, 0, name.strip(),
-                color="white",
-                fontsize=18,
-                fontweight="bold",
-                ha="center",
-                va="center",
-                zorder=5
-            )
+        st.subheader(f"{partner_name.strip()} 💞 {your_name.strip()}")
+        st.metric("Your Fun Compatibility Score", f"{score}%")
+        st.progress(score / 100)
+        st.markdown(f"### {compatibility_label(score)}")
 
+        st.caption(
+            "This is a playful score based on your selected answers, "
+            "not a scientific measurement or prediction of relationship success."
+        )
+
+        st.subheader("💖 Compatibility breakdown")
+
+        c1, c2, c3 = st.columns(3)
+
+        c1.metric(
+            "Shared likes",
+            f"{round(likes_score)}%" if likes_score is not None else "N/A"
+        )
+        c2.metric(
+            "Shared dislikes",
+            f"{round(dislikes_score)}%" if dislikes_score is not None else "N/A"
+        )
+        c3.metric("Quiz match", f"{round(quiz_score)}%")
+
+        st.subheader("💕 Things you have in common")
+
+        common_likes = sorted(set(your_likes) & set(partner_likes))
+        common_dislikes = sorted(set(your_dislikes) & set(partner_dislikes))
+
+        if common_likes:
+            st.write("**You both love:** " + ", ".join(common_likes))
         else:
+            st.write("Your favourite things differ. Discover something new together!")
 
-            # Golden Cupid arrow across the heart
-            arrow = FancyArrowPatch(
-                (-17, -9),
-                (17, 9),
-                arrowstyle="-|>",
-                mutation_scale=35,
-                linewidth=4,
-                color="#FFD700",
-                zorder=5,
-                clip_on=False
+        if common_dislikes:
+            st.write("**You both dislike:** " + ", ".join(common_dislikes))
+
+        if conflicts:
+            st.write(
+                "**Different preferences:** " + ", ".join(sorted(conflicts))
+            )
+            st.caption(
+                "Different preferences are normal. Talk about them with respect."
             )
 
-            ax.add_patch(arrow)
+        st.subheader("💌 Your quiz comparison")
 
-            # Golden highlight on the arrow shaft
-            ax.plot(
-                [-16, 15],
-                [-8.5, 8],
-                color="#FFF0A0",
-                linewidth=1,
-                zorder=6,
-                clip_on=False
-            )
+        quiz_labels = [
+            "Communication style",
+            "Love language",
+            "Ideal weekend"
+        ]
 
-            # Partner name near the arrow tail
-            ax.text(
-                -13, -7.5, partner.strip(),
-                color="black",
-                fontsize=13,
-                fontweight="bold",
-                ha="center",
-                va="center",
-                rotation=28,
-                zorder=7
-            )
+        for label, (first, second) in zip(quiz_labels, quiz_pairs):
+            with st.expander(label):
+                st.write(f"**{your_name.strip()}:** {first}")
+                st.write(f"**{partner_name.strip()}:** {second}")
 
-            # Your name near the arrow head
-            ax.text(
-                12, 7.2, name.strip(),
-                color="black",
-                fontsize=13,
-                fontweight="bold",
-                ha="center",
-                va="center",
-                rotation=28,
-                zorder=7
-            )
+                if first == second:
+                    st.success("You selected the same answer! 💗")
+                else:
+                    st.info("A chance to understand each other better. 🌷")
 
-            # Golden heart accent
-            ax.text(
-                0, 0, "♥",
-                color="#FFD700",
-                fontsize=20,
-                ha="center",
-                va="center",
-                zorder=7
-            )
+    # Heart graphic
+    st.subheader("💘 Your Heart Design")
 
-        # Title
-        ax.set_title(
-            "Your Love, Your Story ❤️",
-            fontsize=18,
-            color="#e91e63",
-            pad=15
+    fig = draw_heart(
+        your_name.strip(),
+        partner_name.strip(),
+        score,
+        single=not is_mingle
+    )
+    st.pyplot(fig, use_container_width=True)
+    plt.close(fig)
+
+    # ---------------- REMINDERS ----------------
+    st.divider()
+    st.header("🎂 Special Dates & Reminders")
+
+    today = date.today()
+
+    birthday1 = next_birthday(your_birthday, today)
+    st.write(
+        f"🎂 **{your_name.strip()}'s birthday:** "
+        f"{your_birthday.strftime('%d %B')} "
+        f"({days_until(birthday1, today)} days to go)"
+    )
+
+    if is_mingle:
+        birthday2 = next_birthday(partner_birthday, today)
+        st.write(
+            f"🎂 **{partner_name.strip()}'s birthday:** "
+            f"{partner_birthday.strftime('%d %B')} "
+            f"({days_until(birthday2, today)} days to go)"
         )
 
-        # Keep complete heart and arrow visible
-        ax.set_aspect("equal")
-        ax.set_xlim(-22, 22)
-        ax.set_ylim(-18, 18)
-        ax.axis("off")
+        if anniversary:
+            next_anniversary = anniversary.replace(year=today.year)
+            if next_anniversary < today:
+                next_anniversary = anniversary.replace(year=today.year + 1)
 
-        plt.tight_layout()
+            st.write(
+                f"💍 **Your anniversary:** "
+                f"{anniversary.strftime('%d %B')} "
+                f"({days_until(next_anniversary, today)} days to go)"
+            )
 
-        # Display heart on the website
-        st.pyplot(fig, use_container_width=True)
+    st.info(
+        "Reminder note: These dates are displayed in this session. "
+        "For automatic notifications when the app is closed, "
+        "you will need a database and a scheduled email or notification service."
+    )
 
-        # Release Matplotlib figure
-        plt.close(fig)
+    # ---------------- SHAREABLE SUMMARY ----------------
+    st.divider()
+    st.subheader("💌 Your Love Note")
 
-        st.success("Your love heart is ready! 💌")
+    if is_mingle:
+        summary = (
+            f"💗 {partner_name.strip()} + {your_name.strip()} 💗\n\n"
+            f"Our fun compatibility score: {score}%\n"
+            f"{compatibility_label(score)}\n\n"
+            f"Things we both love: {', '.join(common_likes) or 'Discovering new things'}\n\n"
+            "Different hearts, one beautiful journey. ❤️"
+        )
+    else:
+        summary = (
+            f"💗 {your_name.strip()}'s Love Story 💗\n\n"
+            "Self-love is the beginning of every beautiful story. ❤️"
+        )
+
+    st.text_area(
+        "Copy your love note",
+        value=summary,
+        height=150
+    )
+
+    st.download_button(
+        "Download Your Love Note 💌",
+        data=summary,
+        file_name="my_love_story.txt",
+        mime="text/plain",
+        use_container_width=True
+    )
+
+    if st.button("Start a New Love Story 🔄"):
+        st.session_state["love_result"] = False
+        st.rerun()
 
 else:
-    st.info("Enter your name and click the button to create your heart.")
+    st.info(
+        "Fill in your details and preferences, then click "
+        "'Create Our Love Story' to see your results. 💕"
+        )
+                
+
+
+            
