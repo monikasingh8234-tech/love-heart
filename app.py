@@ -12,34 +12,136 @@ st.set_page_config(
     layout="centered"
 )
 
+
 st.markdown("""
 <style>
+/* Main page */
 .stApp {
-    background: linear-gradient(180deg, #fff0f5, #fffaf5);
+    background: linear-gradient(180deg, #fff0f5 0%, #fffaf7 100%);
+    color: #35202a !important;
 }
-h1, h2, h3 {
-    color: #d6336c;
+
+[data-testid="stHeader"] {
+    background: transparent;
 }
-div.stButton > button {
-    background: linear-gradient(90deg, #ff5c93, #ff1744);
-    color: white;
-    border-radius: 15px;
-    border: none;
-    padding: 12px;
-    font-weight: bold;
+
+[data-testid="stAppViewContainer"] {
+    background: transparent;
 }
-div.stButton > button:hover {
-    color: white;
-    border: 1px solid #d6336c;
+
+/* Force readable text throughout the app */
+.stApp, .stApp p, .stApp label,
+.stApp span, .stApp li,
+.stApp [data-testid="stMarkdownContainer"] {
+    color: #35202a;
 }
-div[data-testid="stMetric"] {
+
+h1, h2, h3, h4,
+.stApp h1, .stApp h2, .stApp h3 {
+    color: #a81750 !important;
+    font-weight: 800 !important;
+}
+
+.stCaption, [data-testid="stCaptionContainer"] {
+    color: #75475a !important;
+}
+
+/* Input fields */
+.stApp input,
+.stApp textarea,
+.stApp [data-baseweb="select"] > div {
+    background-color: #ffffff !important;
+    color: #35202a !important;
+    border: 1px solid #efb6cc !important;
+    border-radius: 12px !important;
+}
+
+.stApp input::placeholder,
+.stApp textarea::placeholder {
+    color: #866b78 !important;
+    opacity: 1 !important;
+}
+
+/* Radio buttons and checkboxes */
+.stApp [data-testid="stRadio"] label,
+.stApp [data-testid="stCheckbox"] label {
+    color: #35202a !important;
+}
+
+/* Cards and metrics */
+[data-testid="stMetric"] {
+    background: #ffffff !important;
+    border: 1px solid #f2c1d3;
+    border-radius: 18px;
+    padding: 18px;
+    box-shadow: 0 5px 18px rgba(190, 55, 105, 0.08);
+}
+
+[data-testid="stMetricLabel"],
+[data-testid="stMetricValue"] {
+    color: #a81750 !important;
+}
+
+/* Buttons */
+.stApp div.stButton > button,
+.stApp div.stDownloadButton > button {
+    background: linear-gradient(90deg, #ed4784, #d91d61) !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 14px !important;
+    min-height: 48px;
+    font-weight: 700 !important;
+}
+
+.stApp div.stButton > button p,
+.stApp div.stDownloadButton > button p {
+    color: #ffffff !important;
+}
+
+/* Progress bar */
+.stProgress > div > div > div {
+    background-color: #e63375 !important;
+}
+
+/* Expanders */
+[data-testid="stExpander"] {
     background: #ffffff;
-    padding: 15px;
-    border-radius: 15px;
-    border: 1px solid #ffd0df;
+    border: 1px solid #f0c0d2;
+    border-radius: 14px;
+}
+
+/* Alerts */
+[data-testid="stAlert"] {
+    border-radius: 14px;
+}
+
+/* Mobile spacing */
+.block-container {
+    max-width: 900px;
+    padding-top: 1.5rem;
+    padding-bottom: 3rem;
+}
+
+@media (max-width: 600px) {
+    .block-container {
+        padding: 1rem 1rem 2rem;
+    }
+
+    h1 {
+        font-size: 1.8rem !important;
+    }
+
+    h2 {
+        font-size: 1.35rem !important;
+    }
+
+    [data-testid="stMetric"] {
+        padding: 12px;
+    }
 }
 </style>
 """, unsafe_allow_html=True)
+
 
 st.title("💗 Your Love, Your Story")
 st.caption("Two hearts. One story. A little bit of magic. 🎀")
